@@ -1,0 +1,34 @@
+{% extends 'partials/base.html' %}
+{% block title%} Search IMDB Film{% endblock%}
+
+{% block content %}
+
+<div class="container-fluid">
+<h2>Search IMDB Film</h2>
+   <form method="POST">
+        {% csrf_token %}
+        <input type="text" name="search">
+        <input type="submit">
+    </form>
+
+    <table class="table table-hover">
+    <thead>
+      <tr>
+        <th scope="col">Title</th>
+        <th scope="col"></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for movie in movies %}
+      <tr>
+        <td>
+            <a href='{% url 'detail_imdb' movie.movieID %}'><strong>{{movie.title}}</strong> ({{movie.year}})</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>        
+
+</div>
+
+{% endblock %}

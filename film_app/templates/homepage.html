@@ -1,0 +1,104 @@
+{% extends 'partials/base.html' %}
+
+
+
+
+{% block content %}
+
+<div class="container" id="vote_div">
+    <h2> Movies Database </h2>
+    <div class="row">
+        {% for movie in movies %}
+            <div class="col-12 col-md-4">
+                <div class="card mb-3 mr-5">
+                    <img class="card-img-top" src={{movie.poster}}  alt=""  height="300px">
+                    <div class="card-body">
+                        <h5 class="card-title">{{movie.title}}</h5>
+                        <p>{% for category in movie.category.all %}
+                                {% if category == movie.category.all.last %}
+                                    {{category.name}}
+                                {% else %}
+                                    {{category.name}},
+                                {% endif %}
+                            {% endfor %}
+                        </p>
+                        <p class="card-text">{{movie.release_date.year}}</p>
+                        <p class="card-text"><span>Available in :</span>
+                        {% for country in movie.available_in_countries.all %}
+                            {% if country == movie.available_in_countries.all.last %}
+                                <span class="card-text">{{country.name}}</span>
+                            {% else %}
+                                <span class="card-text">{{country.name}}</span>,
+                            {% endif %}
+                        {% endfor %}
+                        </p>
+                        <div>
+                            Vote <span id="movie_vote_{{movie.id}}">{{movie.votes}}</span> 
+                            <button type='button' action="like" movie_id={{movie.id}} class="btn btn-primary btn-sm">+</button>
+                            <button type='button' action="dislike" movie_id={{movie.id}} class="btn btn-danger btn-sm">-</button>
+                        </div>
+                        <br>
+                        <div>
+                            <a  href='{{movie.streaming}}' class="btn btn-outline-dark btn-block" target="_blank">See it in the dark side</a>
+                        </div> 
+                    </div>
+                </div>
+            </div>  
+        {% endfor %}    
+    </div>
+</div>
+
+{% endblock %}
+
+{% block js %}
+        <script type="text/javascript">
+
+            const url = "{% url 'film_vote' %}"
+
+             // add event listner
+             document.getElementById('vote_div').addEventListener('click', function(event){
+                // listen for clicks on the +/- buttons
+                if (event.target.type != 'button'){
+                    return;
+                }
+
+                // extract the movie id from the button
+                const movie_id = event.target.getAttribute("movie_id");
+                const action = event.target.getAttribute("action");
+                const csrftoken = getCookie('csrftoken');
+                const data = {'movie_id': movie_id, 'action':action}
+                
+                // fetch to the server, sending that id.
+                fetch(url, {
+                    headers: {'X-CSRFToken': csrftoken},
+                    method: 'post',
+                    body: (JSON.stringify(data)),
+                })
+                .then(response => response.json())
+                .then(data => vote_result(data, movie_id))
+            }) 
+
+            function vote_result(data, movie_id){
+                const id = "movie_vote_" + movie_id
+                target = document.getElementById(id)
+                target.innerHTML = data.votes
+            }
+            
+            // Django's way to get a csrf token.
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        // Does this cookie string begin with the name we want?
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+        </script>
+{% endblock %}

@@ -1,0 +1,69 @@
+{% extends 'partials/base.html' %}
+{% load mytags %}
+
+{% block title%} Search IMDB Film{% endblock%}
+
+{% block content %}
+
+<div class="container-fluid">
+<h2>Detail IMDB Film</h2>
+
+    <table class="table table-hover">
+    <thead>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          <strong>{{movie.title}}</strong> ({{movie.year}})
+          <br>
+          <p> <strong>Directed by </strong>
+          {% for director in movie.director %}
+              {% if forloop.last %}
+                {{director.name}}
+              {% else%}
+                {{director.name}},
+              {% endif %}
+          {% endfor %} </p>
+          <p><strong>Genre:</strong>
+          {% for genre in movie.genre %}
+              {% if forloop.last %}
+                {{genre}}
+              {% else%}
+                {{genre}} /
+              {% endif %}
+          {% endfor %} </p>
+      
+          <p><strong>Country:</strong>
+          {% for country in movie.country %}
+              {% if forloop.last %}
+                {{country}}
+              {% else%}
+                {{country}} /
+              {% endif %}
+          {% endfor %} </p>
+      
+         
+          <div>
+            {% comment %} Without template filter 
+            <img src= '{{movie.coverurl}}'> {% endcomment %}
+
+            {% comment %}Usage of template filter{% endcomment %}
+            <img src= '{{ movie|parse_field:"cover url" }}'>
+          </div>
+          <div>
+            <p>{{movie.plot.0}}</p>
+            {% comment %} {% for plot in movie.plot %}
+              <p>{{plot}}</p>
+            {% endfor %}  {% endcomment %}
+          </div>
+        </td>
+        <td>
+        <a  href='{% url 'add_from_imdb' movie.movieID %}' class="btn btn-outline-dark btn-block">Add</a>
+        </td>
+      </tr>
+    </tbody>
+  </table>        
+
+</div>
+
+{% endblock %}
