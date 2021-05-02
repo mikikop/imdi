@@ -1,6 +1,11 @@
-from django.urls import path
+from django.urls import path, include
+from rest_framework import routers
 from . import views
 
+
+router = routers.DefaultRouter()
+router.register(r'films', views.FilmViewSet)
+router.register(r'directors', views.DirectorViewSet)
 
 urlpatterns = [
     path('homepage', views.home, name='home'),
@@ -13,4 +18,7 @@ urlpatterns = [
     path('film_results/delete/<int:id>', views.delete_film, name='delete_film'),
     path('film/vote/', views.update_vote, name='film_vote'),
     path('templates/404', views.films_results, name='404'),
+    path('', include(router.urls)),
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
+
 ]

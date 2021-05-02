@@ -10,6 +10,8 @@ from cprint import *
 from django.http import HttpResponse
 import os
 import datetime
+from rest_framework import viewsets, filters
+from .serializers import FilmSerializer, DirectorSerializer
 
 def home(request):
     return render(request, 'homepage.html', {'movies':Film.objects.all()})
@@ -149,3 +151,14 @@ def url_clean(url):
 
 def allow_year(year):
     return f'{year}-10-05 00:00:00'
+
+
+class FilmViewSet(viewsets.ModelViewSet):
+    queryset = Film.objects.all().order_by('title')
+    serializer_class = FilmSerializer
+
+class DirectorViewSet(viewsets.ModelViewSet):
+    queryset = Director.objects.all()
+    serializer_class = DirectorSerializer
+    filter_backends = [filters.OrderingFilter]
+    ordering_fields = ['last_name']
